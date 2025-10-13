@@ -1,0 +1,83 @@
+═══════════════════════════════════════════════════════════════
+   🤖 MILO AI - DÉMARRAGE RAPIDE
+   Intelligence Lab - ECE Paris
+═══════════════════════════════════════════════════════════════
+
+📋 INSTALLATION (À FAIRE UNE SEULE FOIS)
+─────────────────────────────────────────────────────────────
+
+1. Vérifier que Python 3.12 est installé
+   └─> python --version
+
+2. Lancer le script d'installation
+   └─> python INSTALL.py
+
+3. Attendre 10-20 minutes (téléchargement de 1.2 GB)
+
+C'est tout ! ✅
+
+
+🚀 LANCER MILO (À CHAQUE UTILISATION)
+─────────────────────────────────────────────────────────────
+
+1. Ouvrir un terminal dans le dossier du projet
+
+2. Exécuter les commandes suivantes :
+   cd src
+   python back_launcher.py
+
+3. Attendre 30 secondes (chargement des modèles)
+
+4. Ouvrir un navigateur sur :
+   http://127.0.0.1:5000
+
+   ⚠️  N'ouvrez PAS le fichier HTML directement !
+
+
+🎤 UTILISER MILO
+─────────────────────────────────────────────────────────────
+
+1. Cliquer sur le bouton MICROPHONE
+2. Autoriser l'accès au microphone
+3. Poser votre question clairement
+4. Cliquer à nouveau pour arrêter
+5. Attendre 25-30 secondes
+6. Écouter la réponse
+
+
+💡 EXEMPLES DE QUESTIONS
+─────────────────────────────────────────────────────────────
+
+✅ "Bonjour Milo, peux-tu te présenter ?"
+✅ "Quelles sont les majeures disponibles à l'ECE ?"
+✅ "Explique-moi l'alternance"
+✅ "Quelles associations étudiantes existent ?"
+
+❌ "Bonjour" (trop court)
+❌ Questions avec bruit de fond
+
+
+⚠️  PROBLÈMES FRÉQUENTS
+─────────────────────────────────────────────────────────────
+
+▸ Le serveur ne démarre pas
+  └─> Vérifier que tous les packages sont installés
+      pip install -r requirements.txt
+
+▸ Milo ne répond pas
+  └─> Vérifier l'URL : http://127.0.0.1:5000
+      (pas file:///...)
+
+▸ FFmpeg introuvable
+  └─> Vérifier : C:\ffmpeg\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe
+
+
+📞 SUPPORT
+─────────────────────────────────────────────────────────────
+
+Consulter : README_INSTALLATION.md
+Contacter : Mathieu Larnaudie (ING5) ou Youssef Jafaar
+
+
+═══════════════════════════════════════════════════════════════
+Version 1.0 - Octobre 2025
