@@ -9,10 +9,6 @@ ffmpeg.zip
 ffmpeg-8.0-essentials_build/
 ffmpeg-master-latest-win64-gpl/
 
-# Modèles TTS (téléchargés par INSTALL.py)
-audio/tts_models/*.onnx
-audio/tts_models/*.onnx.json
-
 # Fichiers audio générés à l'exécution
 audio/milo_question/
 audio/milo_response/
