@@ -136,6 +136,19 @@ git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct C:\Models\Qwen3-0.6B
 
 ---
 
+### Erreur Qwen2ForCausalLM
+
+**Erreur :** `ModuleNotFoundError: Could not import module 'Qwen2ForCausalLM'`
+
+**Solution :**
+```powershell
+pip install --upgrade transformers
+```
+
+Cette erreur signifie que votre version de `transformers` est trop ancienne (< 4.37.0).
+
+---
+
 ### Erreurs Redis
 
 **Erreur :** `Error 10061 connecting to localhost:6379` ou `unknown command 'XREAD'`
