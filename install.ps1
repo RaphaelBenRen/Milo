@@ -15,6 +15,7 @@ Write-Host ""
 $PROJECT_DIR = Get-Location
 $FFMPEG_DIR = "$PROJECT_DIR\ffmpeg-8.0-essentials_build"
 $QWEN_MODEL = "C:\Models\Qwen3-0.6B"
+$REDIS_DIR = "C:\Redis"
 $PYTHON_MIN_VERSION = "3.10"
 
 # ========================================
@@ -72,11 +73,41 @@ function Install-FFmpeg {
 }
 
 # ========================================
+# Fonction : Installer Redis
+# ========================================
+function Install-Redis {
+    Write-Host ""
+    Write-Host "[3/6] Verification de Redis..." -ForegroundColor Yellow
+
+    if (Test-Path "$REDIS_DIR\redis-server.exe") {
+        Write-Host "  ✓ Redis deja installe" -ForegroundColor Green
+        return $true
+    }
+
+    Write-Host "  → Telechargement de Redis 5.0.14..." -ForegroundColor Cyan
+    try {
+        New-Item -Path $REDIS_DIR -ItemType Directory -Force | Out-Null
+        $redisZip = "$REDIS_DIR\Redis.zip"
+        Invoke-WebRequest -Uri "https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip" -OutFile $redisZip
+
+        Write-Host "  → Extraction de Redis..." -ForegroundColor Cyan
+        Expand-Archive -Path $redisZip -DestinationPath $REDIS_DIR -Force
+        Remove-Item $redisZip
+
+        Write-Host "  ✓ Redis 5.0.14 installe avec succes" -ForegroundColor Green
+        return $true
+    } catch {
+        Write-Host "  ✗ Erreur lors de l'installation de Redis : $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+# ========================================
 # Fonction : Vérifier Qwen3
 # ========================================
 function Check-Qwen3 {
     Write-Host ""
-    Write-Host "[3/5] Verification du modele Qwen3..." -ForegroundColor Yellow
+    Write-Host "[4/6] Verification du modele Qwen3..." -ForegroundColor Yellow
 
     if (Test-Path "$QWEN_MODEL\model.safetensors") {
         Write-Host "  ✓ Modele Qwen3 detecte" -ForegroundColor Green
@@ -110,7 +141,7 @@ function Check-Qwen3 {
 # ========================================
 function Install-PythonPackages {
     Write-Host ""
-    Write-Host "[4/5] Installation des dependances Python..." -ForegroundColor Yellow
+    Write-Host "[5/6] Installation des dependances Python..." -ForegroundColor Yellow
     Write-Host "  (Cela peut prendre 5-10 minutes)" -ForegroundColor Gray
 
     $packages = @(
@@ -150,7 +181,7 @@ function Install-PythonPackages {
 # ========================================
 function Final-Check {
     Write-Host ""
-    Write-Host "[5/5] Verification finale..." -ForegroundColor Yellow
+    Write-Host "[6/6] Verification finale..." -ForegroundColor Yellow
 
     $allGood = $true
 
@@ -167,6 +198,14 @@ function Final-Check {
         Write-Host "  ✓ FFmpeg" -ForegroundColor Green
     } else {
         Write-Host "  ✗ FFmpeg" -ForegroundColor Red
+        $allGood = $false
+    }
+
+    # Vérifier Redis
+    if (Test-Path "$REDIS_DIR\redis-server.exe") {
+        Write-Host "  ✓ Redis" -ForegroundColor Green
+    } else {
+        Write-Host "  ✗ Redis" -ForegroundColor Red
         $allGood = $false
     }
 
@@ -199,15 +238,19 @@ function Show-FinalInstructions {
     Write-Host "========================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Pour lancer Milo :" -ForegroundColor Cyan
-    Write-Host "  1. Ouvrez PowerShell dans ce dossier" -ForegroundColor White
-    Write-Host "  2. Executez : cd src" -ForegroundColor White
-    Write-Host "  3. Executez : python back_launcher.py" -ForegroundColor White
-    Write-Host "  4. Attendez le message 'Qwen3 model loaded successfully'" -ForegroundColor White
-    Write-Host "  5. Ouvrez votre navigateur : http://127.0.0.1:5001" -ForegroundColor White
+    Write-Host "  1. Lancez Redis (terminal 1) :" -ForegroundColor White
+    Write-Host "     C:\Redis\redis-server.exe" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "  2. Lancez Milo (terminal 2) :" -ForegroundColor White
+    Write-Host "     cd milo_ai-main" -ForegroundColor Gray
+    Write-Host "     python src\back_launcher.py" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "  3. Attendez le message 'Qwen3 model loaded successfully'" -ForegroundColor White
+    Write-Host "  4. Ouvrez votre navigateur : http://127.0.0.1:5001" -ForegroundColor White
     Write-Host ""
     Write-Host "Le premier demarrage peut prendre 1-2 minutes." -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "Pour plus d'aide, consultez SETUP.md" -ForegroundColor Gray
+    Write-Host "Pour plus d'aide, consultez SETUP.md ou README.md" -ForegroundColor Gray
     Write-Host ""
 }
 
@@ -237,15 +280,22 @@ if (-not $step2) {
     exit 1
 }
 
-$step3 = Check-Qwen3
+$step3 = Install-Redis
 if (-not $step3) {
+    Write-Host ""
+    Write-Host "Installation interrompue. Erreur lors de l'installation de Redis." -ForegroundColor Red
+    exit 1
+}
+
+$step4 = Check-Qwen3
+if (-not $step4) {
     Write-Host ""
     Write-Host "Installation interrompue. Le modele Qwen3 est requis." -ForegroundColor Red
     exit 1
 }
 
-$step4 = Install-PythonPackages
-if (-not $step4) {
+$step5 = Install-PythonPackages
+if (-not $step5) {
     Write-Host ""
     Write-Host "Installation interrompue. Erreur lors de l'installation des packages Python." -ForegroundColor Red
     exit 1

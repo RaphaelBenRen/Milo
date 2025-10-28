@@ -34,9 +34,15 @@ Consultez le fichier **SETUP.md** pour un guide complet étape par étape.
 
 Une fois l'installation terminée :
 
+1. **Démarrez Redis** (dans un premier terminal) :
 ```powershell
-cd src
-python back_launcher.py
+C:\Redis\redis-server.exe
+```
+
+2. **Lancez Milo** (dans un second terminal) :
+```powershell
+cd milo_ai-main
+python src\back_launcher.py
 ```
 
 Attendez de voir :
@@ -70,6 +76,7 @@ Puis ouvrez votre navigateur sur : **http://127.0.0.1:5001**
 - **4 GB de RAM libre**
 - **5 GB d'espace disque**
 - **Modèle Qwen3** dans `C:\Models\Qwen3-0.6B`
+- **Redis 5.0+** (installé automatiquement par le script d'installation)
 
 ---
 
@@ -129,12 +136,25 @@ git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct C:\Models\Qwen3-0.6B
 
 ---
 
+### Erreurs Redis
+
+**Erreur :** `Error 10061 connecting to localhost:6379` ou `unknown command 'XREAD'`
+
+**Solution :**
+1. Vérifiez que Redis est lancé : `C:\Redis\redis-server.exe`
+2. Si l'erreur `unknown command 'XREAD'` persiste, vous avez une vieille version de Redis
+3. Téléchargez Redis 5.0+ depuis : https://github.com/tporadowski/redis/releases
+4. Extrayez dans `C:\Redis\`
+
+---
+
 ### Milo ne répond pas
 
 **Vérifiez :**
-1. Que le serveur affiche "Qwen3 model loaded successfully"
-2. Que vous êtes bien sur http://127.0.0.1:5001
-3. Les logs dans le terminal pour voir les erreurs
+1. Que Redis est bien lancé (pas d'erreurs `Error 10061`)
+2. Que le serveur affiche "Qwen3 model loaded successfully"
+3. Que vous êtes bien sur http://127.0.0.1:5001
+4. Les logs dans le terminal pour voir les erreurs
 
 ---
 
@@ -143,6 +163,7 @@ git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct C:\Models\Qwen3-0.6B
 - **Flask** : Serveur web
 - **Whisper** : Reconnaissance vocale (OpenAI)
 - **Qwen3** : Modèle de langage (Alibaba)
+- **Redis** : Message broker pour communication entre services
 - **FFmpeg** : Conversion audio
 - **Socket.IO** : Communication temps réel
 

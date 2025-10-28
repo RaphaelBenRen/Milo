@@ -158,7 +158,7 @@ si la question porte sur ce contenu) :
 
     def clean_text_for_tts(self, text: str) -> str:
 
-        return re.sub(r"[^a-zA-Z0-9éèêëàâîïôùûçÉÈÊËÀÂÎÏÔÙÛÇ.,;:!?' \n-]","",text)
+        return re.sub(r"[^a-zA-Z0-9éèêëàâîïôùûçÉÈÊËÀÂÎÏÔÙÛÇ.,;:!?' \n\-+=*/%]","",text)
 
     def run_ollama(self, prompt: str, isQuestion: bool = False) -> str:
         import ollama
@@ -242,7 +242,13 @@ si la question porte sur ce contenu) :
         generated_tokens = output_ids[0][input_length:]
         generated = self._hf_tokenizer.decode(generated_tokens, skip_special_tokens=True)
 
-        return self.clean_text_for_tts(generated)
+        print(f"[DEBUG] Raw generated text (before cleaning): '{generated}'")
+        print(f"[DEBUG] Length: {len(generated)}")
+        cleaned = self.clean_text_for_tts(generated)
+        print(f"[DEBUG] Cleaned text: '{cleaned}'")
+        print(f"[DEBUG] Cleaned length: {len(cleaned)}")
+
+        return cleaned
 
     def generate_from_file(self, transcript_path: Path, isQuestion: bool = False, output_dir: Path = None):
         transcript_path = Path(transcript_path)
@@ -265,7 +271,7 @@ si la question porte sur ce contenu) :
 
         effective_prompt=""
         if(isQuestion):
-            effective_prompt = f"""Voici la question:
+            effective_prompt = f"""Reponds a cette question de maniere concise et precise:
             {transcript}
             """
         else:
@@ -278,13 +284,10 @@ si la question porte sur ce contenu) :
         else:
             result = self.run_ollama(effective_prompt, isQuestion)
 
-        # Si la réponse est vide ou trop courte, utiliser une réponse par défaut
-        if not result or len(result.strip()) < 5:
-            if isQuestion:
-                result = "Bonjour ! Je suis Milo. Comment puis-je t'aider aujourd'hui ?"
-            else:
-                result = "Aucun contenu significatif detecte."
-            print(f"[WARN] Reponse vide ou trop courte, utilisation d'une reponse par defaut")
+        # Si la réponse est vide, logger une erreur mais retourner quand même
+        if not result or len(result.strip()) < 1:
+            print(f"[ERROR] Le modele a genere une reponse vide!")
+            result = ""
 
         target_dir = Path(output_dir) if output_dir else self.output_dir
         target_dir.mkdir(exist_ok=True, parents=True)
