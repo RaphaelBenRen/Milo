@@ -103,37 +103,66 @@ function Install-Redis {
 }
 
 # ========================================
-# Fonction : Vérifier Qwen3
+# Fonction : Installer Qwen3
 # ========================================
-function Check-Qwen3 {
+function Install-Qwen3 {
     Write-Host ""
-    Write-Host "[4/6] Verification du modele Qwen3..." -ForegroundColor Yellow
+    Write-Host "[4/6] Installation du modele Qwen3..." -ForegroundColor Yellow
 
     if (Test-Path "$QWEN_MODEL\model.safetensors") {
-        Write-Host "  [OK] Modele Qwen3 detecte" -ForegroundColor Green
+        Write-Host "  [OK] Modele Qwen3 deja installe" -ForegroundColor Green
         return $true
     }
 
-    Write-Host "  [ERREUR] Modele Qwen3 non trouve" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "  ACTION REQUISE :" -ForegroundColor Yellow
-    Write-Host "  Le modele Qwen3 doit etre place dans : C:\Models\Qwen3-0.6B" -ForegroundColor White
-    Write-Host ""
-    Write-Host "  Option 1 : Copier depuis un autre PC" -ForegroundColor Cyan
-    Write-Host "  - Demandez le dossier Qwen3-0.6B a quelqu'un qui l'a deja" -ForegroundColor White
-    Write-Host "  - Copiez-le dans C:\Models\" -ForegroundColor White
-    Write-Host ""
-    Write-Host "  Option 2 : Telecharger (necessite Git)" -ForegroundColor Cyan
-    Write-Host "  - Installez Git : https://git-scm.com/download/win" -ForegroundColor White
-    Write-Host "  - Executez : git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct C:\Models\Qwen3-0.6B" -ForegroundColor White
+    Write-Host "  -> Telechargement du modele Qwen3 (943 MB)..." -ForegroundColor Cyan
+    Write-Host "  Cela peut prendre 10-30 minutes selon votre connexion Internet" -ForegroundColor Gray
     Write-Host ""
 
-    $response = Read-Host "  Voulez-vous continuer sans le modele ? (o/n)"
-    if ($response -eq "o" -or $response -eq "O") {
-        Write-Host "  [ATTENTION] Installation continue, mais Milo ne pourra pas generer de reponses" -ForegroundColor Yellow
-        return $true
+    try {
+        # Créer le dossier Models
+        New-Item -Path "C:\Models" -ItemType Directory -Force | Out-Null
+
+        # Utiliser Python pour télécharger via huggingface_hub
+        Write-Host "  -> Telechargement en cours..." -ForegroundColor Cyan
+
+        $downloadScript = @"
+from huggingface_hub import snapshot_download
+import sys
+try:
+    snapshot_download(
+        repo_id='Qwen/Qwen2.5-0.5B-Instruct',
+        local_dir='C:/Models/Qwen3-0.6B',
+        resume_download=True
+    )
+    print('SUCCESS')
+except Exception as e:
+    print(f'ERROR: {e}')
+    sys.exit(1)
+"@
+
+        $result = python -c $downloadScript 2>&1
+
+        if ($result -match "SUCCESS" -or (Test-Path "$QWEN_MODEL\model.safetensors")) {
+            Write-Host "  [OK] Modele Qwen3 installe avec succes" -ForegroundColor Green
+            return $true
+        } else {
+            throw "Echec du telechargement"
+        }
+    } catch {
+        Write-Host "  [ERREUR] Impossible de telecharger le modele : $_" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "  Options alternatives :" -ForegroundColor Yellow
+        Write-Host "  1. Demandez le dossier Qwen3-0.6B a quelqu'un qui l'a deja" -ForegroundColor White
+        Write-Host "  2. Telechargez manuellement : git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct C:\Models\Qwen3-0.6B" -ForegroundColor White
+        Write-Host ""
+
+        $response = Read-Host "  Voulez-vous continuer sans le modele ? (o/n)"
+        if ($response -eq "o" -or $response -eq "O") {
+            Write-Host "  [ATTENTION] Installation continue, mais Milo ne pourra pas generer de reponses" -ForegroundColor Yellow
+            return $true
+        }
+        return $false
     }
-    return $false
 }
 
 # ========================================
@@ -287,7 +316,7 @@ if (-not $step3) {
     exit 1
 }
 
-$step4 = Check-Qwen3
+$step4 = Install-Qwen3
 if (-not $step4) {
     Write-Host ""
     Write-Host "Installation interrompue. Le modele Qwen3 est requis." -ForegroundColor Red

@@ -75,8 +75,9 @@ Puis ouvrez votre navigateur sur : **http://127.0.0.1:5001**
 - **Python 3.10+**
 - **4 GB de RAM libre**
 - **5 GB d'espace disque**
-- **Modèle Qwen3** dans `C:\Models\Qwen3-0.6B`
-- **Redis 5.0+** (installé automatiquement par le script d'installation)
+- **Connexion Internet** (pour télécharger les dépendances et le modèle Qwen3)
+
+**Note:** Redis 5.0+ et le modèle Qwen3 sont installés automatiquement par le script d'installation
 
 ---
 
@@ -125,13 +126,16 @@ Téléchargez depuis : https://www.python.org/downloads/
 
 ### Modèle Qwen3 manquant
 
-**Solution :**
-1. Demandez le dossier `Qwen3-0.6B` à quelqu'un qui l'a déjà
-2. Placez-le dans `C:\Models\Qwen3-0.6B`
+**Le modèle s'installe normalement automatiquement avec `install.ps1`.**
 
-Ou téléchargez-le :
+Si le téléchargement automatique échoue:
+
+**Option 1:** Demandez le dossier `Qwen3-0.6B` à quelqu'un qui l'a déjà et placez-le dans `C:\Models\`
+
+**Option 2:** Téléchargez manuellement :
 ```powershell
-git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct C:\Models\Qwen3-0.6B
+pip install huggingface-hub
+python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='Qwen/Qwen2.5-0.5B-Instruct', local_dir='C:/Models/Qwen3-0.6B')"
 ```
 
 ---
