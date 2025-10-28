@@ -28,11 +28,11 @@ function Check-Python {
         $pythonVersion = python --version 2>&1
         if ($pythonVersion -match "Python (\d+\.\d+)") {
             $version = $matches[1]
-            Write-Host "  ✓ Python $version detecte" -ForegroundColor Green
+            Write-Host "  [OK] Python $version detecte" -ForegroundColor Green
             return $true
         }
     } catch {
-        Write-Host "  ✗ Python n'est pas installe" -ForegroundColor Red
+        Write-Host "  [ERREUR] Python n'est pas installe" -ForegroundColor Red
         Write-Host ""
         Write-Host "  ACTION REQUISE :" -ForegroundColor Yellow
         Write-Host "  1. Telechargez Python depuis : https://www.python.org/downloads/" -ForegroundColor White
@@ -51,23 +51,23 @@ function Install-FFmpeg {
     Write-Host "[2/5] Verification de FFmpeg..." -ForegroundColor Yellow
 
     if (Test-Path "$FFMPEG_DIR\bin\ffmpeg.exe") {
-        Write-Host "  ✓ FFmpeg deja installe" -ForegroundColor Green
+        Write-Host "  [OK] FFmpeg deja installe" -ForegroundColor Green
         return $true
     }
 
-    Write-Host "  → Telechargement de FFmpeg..." -ForegroundColor Cyan
+    Write-Host "  -> Telechargement de FFmpeg..." -ForegroundColor Cyan
     try {
         $ffmpegZip = "$PROJECT_DIR\ffmpeg.zip"
         Invoke-WebRequest -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" -OutFile $ffmpegZip
 
-        Write-Host "  → Extraction de FFmpeg..." -ForegroundColor Cyan
+        Write-Host "  -> Extraction de FFmpeg..." -ForegroundColor Cyan
         Expand-Archive -Path $ffmpegZip -DestinationPath $PROJECT_DIR -Force
         Remove-Item $ffmpegZip
 
-        Write-Host "  ✓ FFmpeg installe avec succes" -ForegroundColor Green
+        Write-Host "  [OK] FFmpeg installe avec succes" -ForegroundColor Green
         return $true
     } catch {
-        Write-Host "  ✗ Erreur lors de l'installation de FFmpeg : $_" -ForegroundColor Red
+        Write-Host "  [ERREUR] Erreur lors de l'installation de FFmpeg : $_" -ForegroundColor Red
         return $false
     }
 }
@@ -80,24 +80,24 @@ function Install-Redis {
     Write-Host "[3/6] Verification de Redis..." -ForegroundColor Yellow
 
     if (Test-Path "$REDIS_DIR\redis-server.exe") {
-        Write-Host "  ✓ Redis deja installe" -ForegroundColor Green
+        Write-Host "  [OK] Redis deja installe" -ForegroundColor Green
         return $true
     }
 
-    Write-Host "  → Telechargement de Redis 5.0.14..." -ForegroundColor Cyan
+    Write-Host "  -> Telechargement de Redis 5.0.14..." -ForegroundColor Cyan
     try {
         New-Item -Path $REDIS_DIR -ItemType Directory -Force | Out-Null
         $redisZip = "$REDIS_DIR\Redis.zip"
         Invoke-WebRequest -Uri "https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip" -OutFile $redisZip
 
-        Write-Host "  → Extraction de Redis..." -ForegroundColor Cyan
+        Write-Host "  -> Extraction de Redis..." -ForegroundColor Cyan
         Expand-Archive -Path $redisZip -DestinationPath $REDIS_DIR -Force
         Remove-Item $redisZip
 
-        Write-Host "  ✓ Redis 5.0.14 installe avec succes" -ForegroundColor Green
+        Write-Host "  [OK] Redis 5.0.14 installe avec succes" -ForegroundColor Green
         return $true
     } catch {
-        Write-Host "  ✗ Erreur lors de l'installation de Redis : $_" -ForegroundColor Red
+        Write-Host "  [ERREUR] Erreur lors de l'installation de Redis : $_" -ForegroundColor Red
         return $false
     }
 }
@@ -110,11 +110,11 @@ function Check-Qwen3 {
     Write-Host "[4/6] Verification du modele Qwen3..." -ForegroundColor Yellow
 
     if (Test-Path "$QWEN_MODEL\model.safetensors") {
-        Write-Host "  ✓ Modele Qwen3 detecte" -ForegroundColor Green
+        Write-Host "  [OK] Modele Qwen3 detecte" -ForegroundColor Green
         return $true
     }
 
-    Write-Host "  ✗ Modele Qwen3 non trouve" -ForegroundColor Red
+    Write-Host "  [ERREUR] Modele Qwen3 non trouve" -ForegroundColor Red
     Write-Host ""
     Write-Host "  ACTION REQUISE :" -ForegroundColor Yellow
     Write-Host "  Le modele Qwen3 doit etre place dans : C:\Models\Qwen3-0.6B" -ForegroundColor White
@@ -130,7 +130,7 @@ function Check-Qwen3 {
 
     $response = Read-Host "  Voulez-vous continuer sans le modele ? (o/n)"
     if ($response -eq "o" -or $response -eq "O") {
-        Write-Host "  ⚠ Installation continue, mais Milo ne pourra pas generer de reponses" -ForegroundColor Yellow
+        Write-Host "  [ATTENTION] Installation continue, mais Milo ne pourra pas generer de reponses" -ForegroundColor Yellow
         return $true
     }
     return $false
@@ -159,7 +159,7 @@ function Install-PythonPackages {
     )
 
     try {
-        Write-Host "  → Installation en cours..." -ForegroundColor Cyan
+        Write-Host "  -> Installation en cours..." -ForegroundColor Cyan
         pip install --upgrade pip | Out-Null
 
         foreach ($package in $packages) {
@@ -168,10 +168,10 @@ function Install-PythonPackages {
 
         pip install $packages 2>&1 | Out-Null
 
-        Write-Host "  ✓ Toutes les dependances sont installees" -ForegroundColor Green
+        Write-Host "  [OK] Toutes les dependances sont installees" -ForegroundColor Green
         return $true
     } catch {
-        Write-Host "  ✗ Erreur lors de l'installation des packages : $_" -ForegroundColor Red
+        Write-Host "  [ERREUR] Erreur lors de l'installation des packages : $_" -ForegroundColor Red
         return $false
     }
 }
@@ -187,41 +187,41 @@ function Final-Check {
 
     # Vérifier Python
     if (python --version 2>&1) {
-        Write-Host "  ✓ Python" -ForegroundColor Green
+        Write-Host "  [OK] Python" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ Python" -ForegroundColor Red
+        Write-Host "  [ERREUR] Python" -ForegroundColor Red
         $allGood = $false
     }
 
     # Vérifier FFmpeg
     if (Test-Path "$FFMPEG_DIR\bin\ffmpeg.exe") {
-        Write-Host "  ✓ FFmpeg" -ForegroundColor Green
+        Write-Host "  [OK] FFmpeg" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ FFmpeg" -ForegroundColor Red
+        Write-Host "  [ERREUR] FFmpeg" -ForegroundColor Red
         $allGood = $false
     }
 
     # Vérifier Redis
     if (Test-Path "$REDIS_DIR\redis-server.exe") {
-        Write-Host "  ✓ Redis" -ForegroundColor Green
+        Write-Host "  [OK] Redis" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ Redis" -ForegroundColor Red
+        Write-Host "  [ERREUR] Redis" -ForegroundColor Red
         $allGood = $false
     }
 
     # Vérifier Qwen3
     if (Test-Path "$QWEN_MODEL\model.safetensors") {
-        Write-Host "  ✓ Modele Qwen3" -ForegroundColor Green
+        Write-Host "  [OK] Modele Qwen3" -ForegroundColor Green
     } else {
-        Write-Host "  ⚠ Modele Qwen3 (optionnel pour le test)" -ForegroundColor Yellow
+        Write-Host "  [ATTENTION] Modele Qwen3 (optionnel pour le test)" -ForegroundColor Yellow
     }
 
     # Vérifier les packages Python
     try {
         python -c "import flask, flask_socketio, flask_cors, faster_whisper, torch, transformers" 2>&1 | Out-Null
-        Write-Host "  ✓ Packages Python" -ForegroundColor Green
+        Write-Host "  [OK] Packages Python" -ForegroundColor Green
     } catch {
-        Write-Host "  ✗ Packages Python" -ForegroundColor Red
+        Write-Host "  [ERREUR] Packages Python" -ForegroundColor Red
         $allGood = $false
     }
 
