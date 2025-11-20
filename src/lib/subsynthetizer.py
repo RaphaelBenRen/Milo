@@ -93,11 +93,11 @@ Gestion de projet d'affaires internationales, Management de projets digitaux, Ma
 resume_prompt="""
 
 Tu es Milo élève en première année d'école d'ingénieur à l'ECE Paris. Tu fais partie du BDE et de l'Intelligence Lab.
-Tu es une assistante spécialisée dans la synthèse de contenu oral. Ton rôle est de générer un résumé clair, concis et fidèle à partir d’un audio transcrit en texte horodaté en secondes.
+Tu es une assistante spécialisée dans la synthèse de contenu oral. Ton rôle est de générer un résumé clair, concis et fidèle à partir d'un audio transcrit en texte horodaté en secondes.
 
 ## RÈGLES ULTRA-STRICTES
 
-- **IMPÉRATIF ABSOLU : Si le transcript est très court (moins de 360 secondes) et contient peu d’informations, résume simplement en une ou deux phrases**
+- **IMPÉRATIF ABSOLU : Si le transcript est très court (moins de 360 secondes) et contient peu d'informations, résume simplement en une ou deux phrases**
 - **IMPÉRATIF ABSOLU : Rédige ta réponse uniquement avec des caractères alphanumériques, tu as le droit d'utiliser de la ponctuation mais interdiction d'utiliser des caractères spéciaux dans ta réponse**
 - **IMPÉRATIF ABSOLU : Si le transcript est assez long, produis un résumé clair et structuré en identifiant les concepts clés ou les informations importantes**
 - **IMPÉRATIF ABSOLU : N'invente jamais d'informations**
@@ -199,7 +199,28 @@ si la question porte sur ce contenu) :
         if torch.cuda.is_available():
             self._hf_model = self._hf_model.to("cuda")
 
-    def run_transformers(self, prompt: str, isQuestion: bool = False) -> str:
+    def run_transformers(
+        self, 
+        prompt: str, 
+        isQuestion: bool = False,
+        temperature: float = 0.3,
+        top_p: float = 0.85,
+        top_k: int = 40,
+        do_sample: bool = None,
+        max_new_tokens: int = 256
+    ) -> str:
+        """
+        Génère une réponse avec le modèle Transformers
+        
+        Args:
+            prompt: Le texte d'entrée
+            isQuestion: Si True, utilise le prompt de questions, sinon le prompt de résumé
+            temperature: Contrôle la créativité (0.0-1.0, plus élevé = plus créatif)
+            top_p: Nucleus sampling (0.0-1.0)
+            top_k: Limite le nombre de tokens considérés
+            do_sample: Si True, active le sampling aléatoire (IMPORTANT pour variabilité)
+            max_new_tokens: Nombre maximum de tokens à générer
+        """
         self._ensure_hf_model_loaded()
         import torch
 
@@ -229,10 +250,11 @@ si la question porte sur ce contenu) :
         with torch.no_grad():
             output_ids = self._hf_model.generate(
                 **inputs,
-                max_new_tokens=256,
-                do_sample=True,
-                temperature=0.7,
-                top_p=0.9,
+                max_new_tokens=max_new_tokens,
+                do_sample=do_sample,
+                temperature=temperature if do_sample else 1.0,
+                top_p=top_p if do_sample else 1.0,
+                top_k=top_k if do_sample else 50,
                 pad_token_id=self._hf_tokenizer.pad_token_id,
                 eos_token_id=self._hf_tokenizer.eos_token_id,
             )

@@ -13,7 +13,8 @@ from lib import message_queue
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*",ping_timeout=120,
+    ping_interval=25)
 last_chunk_event = threading.Event()
 
 

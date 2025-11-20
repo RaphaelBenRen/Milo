@@ -1,31 +1,89 @@
+// ========================================
+// CONFIGURATION SOCKET.IO
+// ========================================
+const socket = io({
+    transports: ['websocket', 'polling'],
+    timeout: 180000,  // 3 minutes
+    reconnectionDelay: 5000,
+    reconnectionDelayMax: 10000
+});
+
+// Écouter la connexion
+socket.on('connect', function() {
+    console.log('Socket connected:', socket.id);
+});
+
+socket.on('disconnect', function() {
+    console.log('Socket disconnected');
+});
+
+// Écouter la réponse audio du backend
+socket.on('audio_response', function(data) {
+    console.log('Audio response received:', data);
+    
+    if (data.audioPath) {
+        // Jouer l'audio reçu
+        const baseURL = window.location.origin;
+        const audioUrl = `${baseURL}/${data.audioPath}`;
+        
+        const audio = new Audio(audioUrl);
+        audio.play()
+            .then(() => {
+                console.log('Audio playing...');
+                setCustomText("Je réponds...");
+            })
+            .catch(err => {
+                console.error('Error playing audio:', err);
+                setCustomText("Erreur lecture audio");
+            });
+            
+        // Quand l'audio est terminé
+        audio.onended = () => {
+            console.log('Audio finished');
+            setCustomText("Prêt !");
+        };
+    }
+});
+
+// Écouter les erreurs
+socket.on('error', function(error) {
+    console.error('Socket error:', error);
+    setCustomText("Erreur de connexion");
+});
+
+// ========================================
+// VARIABLES ET CONSTANTES
+// ========================================
 const img = document.getElementById("btn2_img");
 const btn2 = document.getElementById("button2");
-
 const btn3 = document.getElementById("button3");
-
 const imgOn  = "assets/icons/REC_STOP_BLEU.png";
 const imgOff = "assets/icons/REC_launch_BLEU.png";
 
 let isOn = false;
-
 let isRecording = false;
 let mediaRecorder;
 let audioChunks = [];
-
+let chunkInterval = null;
 const CHUNK_DURATION = 1 * 10 * 1000;
 
+// ========================================
+// BOUTON 2 - ENREGISTREMENT PAR CHUNKS
+// ========================================
 btn2.addEventListener("click", async (e) => {
   e.preventDefault();
-
+  
+  const baseURL = window.location.origin;
+  
   if (!isRecording) {
+    // Démarrer l'enregistrement
     try {
-      const baseURL = window.location.origin;
       const startResponse = await fetch(`${baseURL}/start-recording`, {
         method: "POST"
       });
       const startData = await startResponse.json();
       console.log("Start recording response:", startData);
-
+      
       if (startData.status !== "ok") {
         console.error("Erreur lors du démarrage de l'enregistrement sur le serveur");
         return;
@@ -34,20 +92,20 @@ btn2.addEventListener("click", async (e) => {
       console.error("Erreur lors de la requête /start-recording:", err);
       return;
     }
-
+    
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream);
-
+    
     mediaRecorder.ondataavailable = async (event) => {
       if (event.data && event.data.size > 0) {
         const blob = event.data;
         const formData = new FormData();
         const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
         formData.append("file", blob, `chunk_${timestamp}.webm`);
-
+        
         const isLastChunk = !isRecording;
         formData.append("last_chunk", isLastChunk);
-
+        
         try {
           const response = await fetch(`${baseURL}/upload-audio`, {
             method: "POST",
@@ -60,57 +118,65 @@ btn2.addEventListener("click", async (e) => {
         }
       }
     };
-
+    
     mediaRecorder.start();
-
+    
     chunkInterval = setInterval(() => {
       if (mediaRecorder.state === "recording") {
         mediaRecorder.stop();
         mediaRecorder.start();
       }
     }, CHUNK_DURATION);
-
+    
     isRecording = true;
     setCustomText("J'écoute le cours...");
     img.src = imgOn;
-
+    
   } else {
+    // Arrêter l'enregistrement
     mediaRecorder.stop();
     isRecording = false;
+    
     if (chunkInterval) {
       clearInterval(chunkInterval);
       chunkInterval = null;
     }
+    
     setCustomText("Je réfléchis ...");
     img.src = imgOff;
   }
 });
 
+// ========================================
+// BOUTON 3 - ENREGISTREMENT COMPLET (QUESTIONS)
+// ========================================
 let isRecordingBtn3 = false;
 let mediaRecorderBtn3;
 let audioChunksBtn3 = [];
 
 btn3.addEventListener("click", async (e) => {
   e.preventDefault();
-
+  
+  const baseURL = window.location.origin;
+  
   if (!isRecordingBtn3) {
+    // Démarrer l'enregistrement de la question
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorderBtn3 = new MediaRecorder(stream);
-
     audioChunksBtn3 = [];
-
+    
     mediaRecorderBtn3.ondataavailable = (event) => {
       if (event.data.size > 0) {
         audioChunksBtn3.push(event.data);
       }
     };
-
+    
     mediaRecorderBtn3.onstop = async () => {
       const audioBlob = new Blob(audioChunksBtn3, { type: "audio/webm" });
       const formData = new FormData();
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
       formData.append("file", audioBlob, `full_${timestamp}.webm`);
-
+      
       try {
         const response = await fetch(`${baseURL}/upload-question`, {
           method: "POST",
@@ -122,16 +188,17 @@ btn3.addEventListener("click", async (e) => {
         console.error("[btn3] Error while sending file: ", err);
       }
     };
-
+    
     mediaRecorderBtn3.start();
     isRecordingBtn3 = true;
     setCustomText("J'enregistre...");
     console.log("Recording started (full record mode)");
-
+    
   } else {
+    // Arrêter l'enregistrement de la question
     mediaRecorderBtn3.stop();
     isRecordingBtn3 = false;
-    setCustomText("Je réflechis...");
+    setCustomText("Je réfléchis...");
     console.log("Recording stopped (full record mode)");
   }
 });
