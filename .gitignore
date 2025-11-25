@@ -2,6 +2,9 @@
 # MILO AI - GitHub .gitignore
 # ======================================
 
+# ====== FICHIERS SENSIBLES (API KEYS) ======
+src/api/config.py
+
 # ====== FICHIERS LOURDS À EXCLURE ======
 
 # FFmpeg (téléchargé par INSTALL.py)
