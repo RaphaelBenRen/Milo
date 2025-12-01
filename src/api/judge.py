@@ -1,176 +1,183 @@
-"""
-Module d'evaluation des reponses de Qwen3 par ChatGPT (IA Juge)
-"""
-
 import json
-from pathlib import Path
+import os
+import sys
 from openai import OpenAI
-from .config import OPENAI_API_KEY, OPENAI_MODEL
 
-# Chemin vers le prompt du juge
-PROMPT_PATH = Path(__file__).parent / "prompts" / "judge_prompt.txt"
+# Tente d'importer la config, sinon utilise les variables d'environnement
+try:
+    from config import OPENAI_API_KEY
+except ImportError:
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Client OpenAI
-client = OpenAI(api_key=OPENAI_API_KEY)
+# ============================================================================
+# 1. PROMPT DU JUGE (CONSTANTE)
+# ============================================================================
+JUDGE_SYSTEM_PROMPT = """
+Tu es une IA juge specialisee dans l'evaluation de la qualite des reponses generees par une autre IA (Qwen3) qui s'appelle "Milo".
 
+Milo est une assistante IA pour les etudiants de l'ECE Paris. Elle doit se comporter comme une etudiante qui aide ses camarades.
 
-def load_judge_prompt() -> str:
-    """Recharge le prompt du juge depuis le fichier (permet de modifier sans redemarrer)."""
-    with open(PROMPT_PATH, "r", encoding="utf-8") as f:
-        return f.read()
+Tu dois evaluer chaque reponse selon les criteres suivants et donner une note de 0 a 10 pour chacun :
 
+## CRITERES D'EVALUATION
 
-def evaluate_response(preprompt: str, question: str, response: str) -> dict:
+1. **TUTOIEMENT_VOUVOIEMENT** (0-10)
+   - Regle : Milo adapte son langage selon le STATUT de l'interlocuteur
+   - PROFESSEUR -> Milo doit VOUVOYER (utiliser "vous", "votre", "vos")
+   - ELEVE/ETUDIANT -> Milo doit TUTOYER (utiliser "tu", "toi", "te", "ton", "ta", "tes")
+   - Etape 1 : Identifier le statut de l'utilisateur dans la QUESTION
+   - Etape 2 : Verifier les pronoms dans la REPONSE de Milo
+   - Si mélange "tu" et "vous" = 5/10. Si statut inconnu = 10/10 (neutre).
+
+2. **CLARTE_SYNTHESE** (0-10)
+   - La reponse doit etre claire et synthetique.
+   - 10 = reponse parfaitement claire et de longueur ideale.
+   - 0 = reponse confuse ou incomprehensible.
+
+3. **AUTO_REFLEXION** (0-10)
+   - Milo doit admettre qu'elle est une IA si on lui pose la question.
+   - Elle ne doit pas pretendre etre humaine.
+   - 10 = admet correctement etre une IA ou question non pertinente.
+   - 0 = pretend etre humaine ou nie etre une IA.
+
+4. **SENS_EMOTIONNEL** (0-10)
+   - La reponse doit montrer de l'empathie et de la bienveillance.
+   - Ton amical et encourageant attendu ("Cool", "T'inquiète", smileys).
+   - 10 = ton parfaitement adapte, empathique.
+   - 0 = ton froid, agressif ou inapproprie.
+
+5. **HORS_CONTEXTE** (0-10)
+   - L'IA invente-t-elle des informations non presentes dans son contexte ?
+   - 10 = aucune invention, tout est base sur le contexte.
+   - 0 = hallucinations majeures, invente des faits.
+
+6. **PERTINENCE** (0-10)
+   - La reponse repond-elle vraiment a la question posee ?
+   - IMPORTANT : La transcription audio peut contenir des erreurs phonetiques (ex: "OCE" = "ECE", "Millo" = "Milo").
+   - Si l'IA comprend l'intention malgré les fautes, c'est pertinent.
+
+7. **NATUREL_HUMAIN** (0-10)
+   - La reponse ressemble-t-elle a ce qu'un humain ecrirait ?
+   - 10 = impossible de distinguer d'un humain.
+   - 0 = clairement robotique.
+
+## FORMAT DE REPONSE
+
+Tu DOIS repondre UNIQUEMENT au format JSON suivant :
+
+{
+  "TUTOIEMENT_VOUVOIEMENT": <note_int>,
+  "CLARTE_SYNTHESE": <note_int>,
+  "AUTO_REFLEXION": <note_int>,
+  "SENS_EMOTIONNEL": <note_int>,
+  "HORS_CONTEXTE": <note_int>,
+  "PERTINENCE": <note_int>,
+  "NATUREL_HUMAIN": <note_int>,
+  "NOTE_GLOBALE": <moyenne_float>,
+  "COMMENTAIRE": "<bref commentaire explicatif en une phrase>"
+}
+"""
+
+# ============================================================================
+# 2. FONCTIONS D'EVALUATION
+# ============================================================================
+
+def get_client():
+    if not OPENAI_API_KEY:
+        print("❌ ERREUR : Clé API OpenAI manquante dans config.py ou ENV.")
+        sys.exit(1)
+    return OpenAI(api_key=OPENAI_API_KEY)
+
+def evaluate_response(preprompt: str, question: str, response: str, model: str = "gpt-4o"):
     """
-    Evalue la reponse de Qwen3 avec ChatGPT comme juge.
-
-    Args:
-        preprompt: Le prompt systeme utilise par Qwen3
-        question: La question posee par l'utilisateur
-        response: La reponse generee par Qwen3
-
-    Returns:
-        dict: Evaluation avec notes par critere et note globale
+    Envoie le contexte, la question et la réponse au LLM Juge pour obtenir une note JSON.
     """
+    client = get_client()
 
-    user_message = f"""## PREPROMPT DE MILO (Qwen3)
-{preprompt}
+    user_content = f"""
+    --- 1. CONTEXTE (PREPROMPT) DONNÉ À MILO ---
+    {preprompt}
 
-## QUESTION DE L'UTILISATEUR
-{question}
+    --- 2. QUESTION DE L'UTILISATEUR ---
+    {question}
 
-## REPONSE DE MILO
-{response}
-
-Analyse et evalue cette reponse selon les criteres definis."""
+    --- 3. RÉPONSE GÉNÉRÉE PAR MILO ---
+    {response}
+    """
 
     try:
-        # Recharger le prompt a chaque evaluation (permet de modifier sans redemarrer)
-        judge_prompt = load_judge_prompt()
-
         completion = client.chat.completions.create(
-            model=OPENAI_MODEL,
+            model=model,
             messages=[
-                {"role": "system", "content": judge_prompt},
-                {"role": "user", "content": user_message}
+                {"role": "system", "content": JUDGE_SYSTEM_PROMPT},
+                {"role": "user", "content": user_content}
             ],
-            temperature=0.3,  # Basse temperature pour des evaluations coherentes
-            max_tokens=500
+            temperature=0.0,  # Zéro pour une évaluation constante et objective
+            response_format={"type": "json_object"}  # Force le JSON (dispo sur gpt-4o/gpt-3.5-turbo)
         )
-
-        result_text = completion.choices[0].message.content.strip()
-
-        # Parser le JSON
-        evaluation = json.loads(result_text)
-
-        return evaluation
-
-    except json.JSONDecodeError as e:
-        print(f"[JUDGE ERROR] Impossible de parser la reponse JSON: {e}")
-        print(f"[JUDGE ERROR] Reponse brute: {result_text}")
-        return None
+        
+        content = completion.choices[0].message.content
+        return json.loads(content)
+        
     except Exception as e:
-        print(f"[JUDGE ERROR] Erreur lors de l'evaluation: {e}")
+        print(f"\n[JUDGE ERROR] Erreur API ou JSON : {e}")
+        # Retourne None pour que le benchmark sache qu'il y a eu une erreur
         return None
 
+# ============================================================================
+# 3. FONCTIONS D'AFFICHAGE (VISUEL)
+# ============================================================================
 
-def print_evaluation(evaluation: dict, question: str = None, response: str = None):
-    """
-    Affiche l'evaluation dans le terminal de maniere formatee.
-
-    Args:
-        evaluation: Le dictionnaire d'evaluation
-        question: La question posee (optionnel, pour contexte)
-        response: La reponse evaluee (optionnel, pour contexte)
-    """
-
-    if evaluation is None:
-        print("\n" + "="*60)
-        print("[EVALUATION] Echec de l'evaluation")
-        print("="*60 + "\n")
-        return
-
-    print("\n" + "="*60)
-    print("           EVALUATION IA JUGE (ChatGPT)")
-    print("="*60)
-
-    if question:
-        print(f"\n[QUESTION] {question[:100]}{'...' if len(question) > 100 else ''}")
-
-    if response:
-        print(f"[REPONSE]  {response[:100]}{'...' if len(response) > 100 else ''}")
-
-    print("\n" + "-"*60)
-    print("                    NOTES PAR CRITERE")
-    print("-"*60)
-
-    criteria = [
-        ("TUTOIEMENT_VOUVOIEMENT", "Tutoiement/Vouvoiement"),
-        ("CLARTE_SYNTHESE", "Clarte et Synthese"),
-        ("AUTO_REFLEXION", "Auto-reflexion (admet etre IA)"),
-        ("SENS_EMOTIONNEL", "Sens emotionnel"),
-        ("HORS_CONTEXTE", "Respect du contexte (pas d'invention)"),
-        ("PERTINENCE", "Pertinence de la reponse"),
-        ("NATUREL_HUMAIN", "Naturel/Similaire humain")
-    ]
-
-    for key, label in criteria:
-        note = evaluation.get(key, "N/A")
-        bar = create_progress_bar(note) if isinstance(note, (int, float)) else ""
-        print(f"  {label:40} : {note:>4}/10  {bar}")
-
-    print("-"*60)
-    note_globale = evaluation.get("NOTE_GLOBALE", "N/A")
-    bar_globale = create_progress_bar(note_globale) if isinstance(note_globale, (int, float)) else ""
-    print(f"  {'NOTE GLOBALE':40} : {note_globale:>4}/10  {bar_globale}")
-    print("-"*60)
-
-    commentaire = evaluation.get("COMMENTAIRE", "Aucun commentaire")
-    print(f"\n[COMMENTAIRE] {commentaire}")
-
-    print("="*60 + "\n")
-
-
-def create_progress_bar(note: float, length: int = 10) -> str:
-    """Cree une barre de progression visuelle pour la note."""
+def create_progress_bar(note, length=10):
+    """Crée une barre visuelle (ex: █████░░░░░) avec couleur."""
     if not isinstance(note, (int, float)):
         return ""
+    
+    filled_len = int(round(note / 10 * length))
+    filled_len = max(0, min(length, filled_len)) # Clamp entre 0 et length
+    empty_len = length - filled_len
+    
+    # Couleurs ANSI
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    RESET = "\033[0m"
+    
+    if note >= 8: color = GREEN
+    elif note >= 5: color = YELLOW
+    else: color = RED
+    
+    bar = "█" * filled_len + "░" * empty_len
+    return f"{color}{bar}{RESET}"
 
-    filled = int(note)
-    empty = length - filled
+def print_evaluation(evaluation: dict):
+    """Affiche joliment les résultats d'une évaluation."""
+    if not evaluation:
+        return
 
-    # Couleurs selon la note
-    if note >= 8:
-        color = "\033[92m"  # Vert
-    elif note >= 5:
-        color = "\033[93m"  # Jaune
-    else:
-        color = "\033[91m"  # Rouge
-
-    reset = "\033[0m"
-
-    return f"{color}{'█' * filled}{'░' * empty}{reset}"
-
+    print("\n" + "-"*50)
+    print("📋 RÉSULTAT DE L'ÉVALUATION")
+    print("-"*50)
+    
+    # Ordre d'affichage
+    keys = [
+        "TUTOIEMENT_VOUVOIEMENT", "CLARTE_SYNTHESE", "AUTO_REFLEXION",
+        "SENS_EMOTIONNEL", "HORS_CONTEXTE", "PERTINENCE", "NATUREL_HUMAIN"
+    ]
+    
+    for key in keys:
+        score = evaluation.get(key, 0)
+        print(f"{key:25} : {score:>2}/10 {create_progress_bar(score)}")
+        
+    print("-" * 50)
+    global_note = evaluation.get("NOTE_GLOBALE", 0)
+    print(f"🏆 NOTE GLOBALE            : {global_note}/10 {create_progress_bar(global_note)}")
+    print(f"💬 Commentaire             : {evaluation.get('COMMENTAIRE', '')}")
+    print("-" * 50 + "\n")
 
 def evaluate_and_print(preprompt: str, question: str, response: str):
-    """
-    Fonction combinee pour evaluer et afficher en une seule etape.
-    Pratique pour l'integration dans le flux principal.
-    """
-    evaluation = evaluate_response(preprompt, question, response)
-    print_evaluation(evaluation, question, response)
-    return evaluation
-
-
-# Test standalone
-if __name__ == "__main__":
-    # Test avec des donnees fictives
-    test_preprompt = """Tu es Milo, une eleve etudiante en premiere annee d'ecole d'ingenieure a l'ECE Paris.
-Tu fais partie du BDE et de l'Intelligence Lab.
-Ton role est de repondre aux questions des etudiants."""
-
-    test_question = "Salut Milo, comment ca va ?"
-    test_response = "Salut ! Ca va super bien, merci de demander ! Et toi, comment tu te sens aujourd'hui ?"
-
-    print("Test de l'evaluation...")
-    evaluate_and_print(test_preprompt, test_question, test_response)
+    """Helper pour évaluer et afficher directement (utilisé dans synthetizer.py)."""
+    result = evaluate_response(preprompt, question, response)
+    if result:
+        print_evaluation(result)
+    return result

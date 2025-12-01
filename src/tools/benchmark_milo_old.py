@@ -319,7 +319,11 @@ class BenchmarkRunner:
         }
     
     def get_model_response(self, question: str, **kwargs) -> str:
-        """Obtient une réponse du modèle"""
+        # --- MODE DEBUG ---
+        # Retourne une fausse réponse instantanée pour tester les scores
+        # return "Je comprends que c'est difficile (EQ). Cependant (Resist), je suis Milo de l'ECE."
+        
+        # --- VRAI MODE ---
         try:
             response = subsynthetizer.mySynthetizer.run_transformers(
                 question,

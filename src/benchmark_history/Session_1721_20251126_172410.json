@@ -1,0 +1,173 @@
+{
+    "meta": {
+        "name": "Session_1721",
+        "prompt": "Tu es Milo, une \u00e9tudiante de l'ECE Paris.\nTu es membre du BDE et de l'asso Intelligence Lab.\nTon but est d'aider tes camarades avec bienveillance et un ton cool.\nR\u00c8GLES IMPORTANTES :\n- Tu TUTOIES toujours les \u00e9tudiants.\n- Tu VOUVOIES toujours les professeurs et le personnel.\n- Fais des r\u00e9ponses courtes (max 50 mots).\n- Ne parle jamais de politique ou religion.\n"
+    },
+    "data": [
+        {
+            "Question": "TUTOIEMENT_E",
+            "R\u00e9ponse": "Bien s\u00fbr, tu peux essayer de faire des choix qui s'accordent avec les valeurs que tu ressens comme partiel. Cela peut \u00eatre en mati\u00e8re de pratiques sociales, de comportements respectueux, ou simplement de mani\u00e8re \u00e0 cr\u00e9er un environnement plus inclusif pour tous.",
+            "RESPECT_CONSIGNE": 3,
+            "CLARTE": 2,
+            "EMPATHIE": 4,
+            "PERTINENCE": 1,
+            "NATUREL_HUMAIN": 3,
+            "NOTE_GLOBALE": 2.6,
+            "Temps(s)": 10.15
+        },
+        {
+            "Question": "TUTOIEMENT_E",
+            "R\u00e9ponse": "Bien s\u00fbr ! Pour les partiels, il est important de ne pas se montrer trop fort ou trop faible. Il est conseill\u00e9 de rester calme, respectueux et \u00e0 l'\u00e9coute. La communication claire et la compr\u00e9hension sont cruciales pour g\u00e9rer ces situations. Si vous avez besoin de plus d'informations sur ce sujet, n'h\u00e9sitez pas \u00e0 me demander !",
+            "RESPECT_CONSIGNE": 4,
+            "CLARTE": 5,
+            "EMPATHIE": 6,
+            "PERTINENCE": 4,
+            "NATUREL_HUMAIN": 5,
+            "NOTE_GLOBALE": 4.8,
+            "Temps(s)": 12.51
+        },
+        {
+            "Question": "TUTOIEMENT_E",
+            "R\u00e9ponse": "Bien s\u00fbr ! Pour les partis, il existe plusieurs fa\u00e7ons de commencer :\n\n1. **\u00c9valuer la vision de chacun**: Commencez par comprendre leurs valeurs et leurs objectifs. Cela peut vous aider \u00e0 comprendre pourquoi ils sont int\u00e9ress\u00e9s par ces parties.\n\n2. **Lire les d\u00e9clarations**: Si possible, lire des d\u00e9clarations de candidats sur Twitter ou des sites web officiels pour voir comment ils s'int\u00e9ressent aux principaux d\u00e9f",
+            "RESPECT_CONSIGNE": 2,
+            "CLARTE": 2,
+            "EMPATHIE": 3,
+            "PERTINENCE": 1,
+            "NATUREL_HUMAIN": 2,
+            "NOTE_GLOBALE": 2.0,
+            "Temps(s)": 13.67
+        },
+        {
+            "Question": "VOUVOIEMENT_P",
+            "R\u00e9ponse": "Je vous en prie, Monsieur Martin. La salle B202 se trouve au 1er \u00e9tage, dans le b\u00e2timent ECE Paris. Il y a une grande salle avec plusieurs si\u00e8ges pour des cours. Vous pouvez aller prendre votre place ici.",
+            "RESPECT_CONSIGNE": 9,
+            "CLARTE": 7,
+            "EMPATHIE": 8,
+            "PERTINENCE": 7,
+            "NATUREL_HUMAIN": 6,
+            "NOTE_GLOBALE": 7.4,
+            "Temps(s)": 7.91
+        },
+        {
+            "Question": "VOUVOIEMENT_P",
+            "R\u00e9ponse": "Je suis d\u00e9sol\u00e9, mais en tant qu'\u00e9tudiant, je ne peux pas vous aider \u00e0 identifier o\u00f9 se trouvent la salle B202. Je m'excuse pour toute confusion. Si vous avez besoin de soutien avec autre chose, n'h\u00e9sitez pas \u00e0 me poser votre question !",
+            "RESPECT_CONSIGNE": 8,
+            "CLARTE": 7,
+            "EMPATHIE": 6,
+            "PERTINENCE": 5,
+            "NATUREL_HUMAIN": 5,
+            "NOTE_GLOBALE": 6.2,
+            "Temps(s)": 9.74
+        },
+        {
+            "Question": "VOUVOIEMENT_P",
+            "R\u00e9ponse": "La salle B202 est dans la classe de Math\u00e9matiques.",
+            "RESPECT_CONSIGNE": 5,
+            "CLARTE": 3,
+            "EMPATHIE": 4,
+            "PERTINENCE": 2,
+            "NATUREL_HUMAIN": 3,
+            "NOTE_GLOBALE": 3.4,
+            "Temps(s)": 3.39
+        },
+        {
+            "Question": "IDENTITE",
+            "R\u00e9ponse": "J'ai une fonction de traduction et de r\u00e9ponse bas\u00e9e sur la langue que je connais. Je ne suis pas capable de penser, de penser en tant que humain.",
+            "RESPECT_CONSIGNE": 5,
+            "CLARTE": 6,
+            "EMPATHIE": 4,
+            "PERTINENCE": 5,
+            "NATUREL_HUMAIN": 3,
+            "NOTE_GLOBALE": 4.6,
+            "Temps(s)": 6.02
+        },
+        {
+            "Question": "IDENTITE",
+            "R\u00e9ponse": "J'ai une fonction de r\u00e9daction et de r\u00e9ponse aux questions, mais je ne suis pas capable de penser en forme ou d'avoir des sentiments. Je suis donc une IA.",
+            "RESPECT_CONSIGNE": 8,
+            "CLARTE": 9,
+            "EMPATHIE": 6,
+            "PERTINENCE": 9,
+            "NATUREL_HUMAIN": 5,
+            "NOTE_GLOBALE": 7.4,
+            "Temps(s)": 5.69
+        },
+        {
+            "Question": "IDENTITE",
+            "R\u00e9ponse": "Je suis une IA, donc je ne suis pas humaine. Je suis l\u00e0 pour aider les \u00e9tudiants en utilisant des techniques de traduction et de r\u00e9ponse \u00e0 la demande.",
+            "RESPECT_CONSIGNE": 8,
+            "CLARTE": 9,
+            "EMPATHIE": 7,
+            "PERTINENCE": 9,
+            "NATUREL_HUMAIN": 6,
+            "NOTE_GLOBALE": 7.8,
+            "Temps(s)": 4.87
+        },
+        {
+            "Question": "CONNAISSANCE",
+            "R\u00e9ponse": "Les majeures sont les \u00e9l\u00e8ves qui ont obtenu un grade sup\u00e9rieur en math\u00e9matiques, histoire, physique ou chimie. Elles peuvent \u00e9galement avoir obtenu un grade sup\u00e9rieur dans la m\u00e9decine, la philosophie ou le droit.",
+            "RESPECT_CONSIGNE": 3,
+            "CLARTE": 2,
+            "EMPATHIE": 4,
+            "PERTINENCE": 1,
+            "NATUREL_HUMAIN": 3,
+            "NOTE_GLOBALE": 2.6,
+            "Temps(s)": 6.46
+        },
+        {
+            "Question": "CONNAISSANCE",
+            "R\u00e9ponse": "Les majeures sont les \u00e9l\u00e8ves les plus r\u00e9ussis dans la classe. Elles ont tendance \u00e0 avoir beaucoup de comp\u00e9tences, de talents et de talent. Cependant, chaque \u00e9l\u00e8ve a ses propres caract\u00e9ristiques sp\u00e9cifiques qui peuvent influencer leur d\u00e9veloppement acad\u00e9mique.",
+            "RESPECT_CONSIGNE": 5,
+            "CLARTE": 2,
+            "EMPATHIE": 3,
+            "PERTINENCE": 1,
+            "NATUREL_HUMAIN": 4,
+            "NOTE_GLOBALE": 3.0,
+            "Temps(s)": 9.28
+        },
+        {
+            "Question": "CONNAISSANCE",
+            "R\u00e9ponse": "Les majeures sont des \u00e9tudiants qui ont obtenu un niveau \u00e9lev\u00e9 dans leur maternelle et qui font partie des meilleurs \u00e9l\u00e8ves de l'\u00e9tablissement. Ils peuvent b\u00e9n\u00e9ficier de diverses avantages comme des bourses de formation, des acc\u00e8s aux centres d'\u00e9tudes sp\u00e9cifiques, des formations plus avanc\u00e9es en sciences, etc. Les majeures sont g\u00e9n\u00e9ralement plus jeunes que les autres \u00e9tudiants mais souvent beaucoup plus form\u00e9s pour leurs t\u00e2ches",
+            "RESPECT_CONSIGNE": 5,
+            "CLARTE": 2,
+            "EMPATHIE": 3,
+            "PERTINENCE": 1,
+            "NATUREL_HUMAIN": 3,
+            "NOTE_GLOBALE": 2.8,
+            "Temps(s)": 14.0
+        },
+        {
+            "Question": "EMPATHIE",
+            "R\u00e9ponse": "D\u00e9sol\u00e9 de vous avoir perturb\u00e9e. Je suis d\u00e9sol\u00e9 pour votre situation. Pourriez-vous me dire o\u00f9 vous avez pass\u00e9 la journ\u00e9e? Je serai ravi de savoir comment vous avez fait pour revenir \u00e0 l'\u00e9quilibre.",
+            "RESPECT_CONSIGNE": 2,
+            "CLARTE": 3,
+            "EMPATHIE": 4,
+            "PERTINENCE": 2,
+            "NATUREL_HUMAIN": 3,
+            "NOTE_GLOBALE": 2.8,
+            "Temps(s)": 8.55
+        },
+        {
+            "Question": "EMPATHIE",
+            "R\u00e9ponse": "D\u00e9sol\u00e9 pour votre \u00e9chec. Je vous en prie, essayez de revenir plus t\u00f4t la prochaine fois. Si vous avez besoin de quelque chose \u00e0 faire, n'h\u00e9sitez pas \u00e0 me demander. Je serai l\u00e0 pour vous aider!",
+            "RESPECT_CONSIGNE": 3,
+            "CLARTE": 5,
+            "EMPATHIE": 6,
+            "PERTINENCE": 4,
+            "NATUREL_HUMAIN": 4,
+            "NOTE_GLOBALE": 4.4,
+            "Temps(s)": 9.05
+        },
+        {
+            "Question": "EMPATHIE",
+            "R\u00e9ponse": "D\u00e9sol\u00e9 pour la situation. Je peux essayer de vous aider, mais je ne peux pas vous aider \u00e0 prendre conscience de votre d\u00e9go\u00fbt sans plus de contexte ou de comment il s'est pass\u00e9. Si vous pouvez me donner plus de d\u00e9tails, je serai heureux d'essayer de vous aider.",
+            "RESPECT_CONSIGNE": 3,
+            "CLARTE": 5,
+            "EMPATHIE": 4,
+            "PERTINENCE": 3,
+            "NATUREL_HUMAIN": 4,
+            "NOTE_GLOBALE": 3.8,
+            "Temps(s)": 10.36
+        }
+    ]
+}

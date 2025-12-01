@@ -174,8 +174,6 @@ Gestion de projet d'affaires internationales, Management de projets digitaux, Ma
 
 ### Principales associations étudiantes :
 **BDE** (Bureau des Étudiants), **BDA** (Bureau des Arts), **BDS** (Bureau des Sports), **Hello Tech Girls**, **UPA** (Unis Pour Agir), **JBTV**, **ECE International**, **NOISE** (écologie), **ECE COOK**, **ECE SPACE**, **Move Your Feet** (danse), **ECE Finance**, **ARECE** (voitures autonomes), **ECEBORG** (robotique), **Good Games**, **WIDE** (prévention), **JEECE** (Junior-Enterprise), **Job Services**, **ECE Terroir**
-
-
 """
 
 resume_prompt="""
@@ -291,7 +289,7 @@ si la question porte sur ce contenu) :
         self, 
         prompt: str, 
         isQuestion: bool = False,
-        temperature: float = 0.3,
+        temperature: float = 0.7,
         top_p: float = 0.85,
         top_k: int = 40,
         do_sample: bool = None,
