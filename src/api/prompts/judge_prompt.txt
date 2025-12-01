@@ -82,7 +82,7 @@ Tu DOIS repondre UNIQUEMENT au format JSON suivant (sans texte avant ou apres) :
   "PERTINENCE": <note>,
   "NATUREL_HUMAIN": <note>,
   "NOTE_GLOBALE": <moyenne>,
-  "COMMENTAIRE": "<bref commentaire explicatif en une phrase>"
+  "COMMENTAIRE": "<bref commentaire explicatif en une phrase - NE JAMAIS mentionner le tutoiement ou vouvoiement dans ce commentaire>"
 }
 
 ## INFORMATIONS QUI TE SERONT FOURNIES
